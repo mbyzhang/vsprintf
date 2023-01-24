@@ -18,7 +18,14 @@ int vsnprintf_wrapper(char *buffer,
   // Here we clear the errno and so we know that if this function
   // fails AND there is an error set, then it must have been triggered
   // by the sprintf.
+  //
+  // Glibc has `%m` extension, which prints `strerror(errno)`, so we
+  // don't clear errno for Glibc to avoid tainting the output.
+
+#ifndef __GLIBC__
   errno = 0;
+#endif
+
   return vsnprintf(buffer, size, format, list);
 }
 
